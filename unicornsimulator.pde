@@ -5,10 +5,8 @@ int offset_y = -110;
 int mode = 0;
 int index = 0;
 VStrip[] strips = new VStrip[3];
-int modes[] = new int[6];
+int modes[] = new int[8];
 color rainbowWipeColor = color(0, 0, 0);
-
-
 
 void setup() {
   size(680, 394);
@@ -24,6 +22,8 @@ void setup() {
   modes[3] = 100;  // rainbowWarp
   modes[4] = 100;  // rainbowWarp
   modes[5] = 100;  // rainbowWarp
+  modes[6] = 100;  // blinkyBlinky
+  modes[7] = 100;  // sparklySparkly
 
 
   strips[0] = new VStrip(unicorn.getChild("frontleg"));
@@ -94,6 +94,15 @@ void sparklySparkly(int index)
   }
 }
 
+void clear()
+{
+  for (VStrip strip : strips) {
+    for (int led = 0; led < strip.numPixels(); led++) {
+      strip.setPixelColor(led, color(0)); 
+    }
+  } 
+}
+
 void draw() {
   image(bg, 0, 0);
   if (frameCount % 1 == 0) index++;
@@ -105,19 +114,13 @@ void draw() {
   }
 
   switch(mode) {
+
   case 0:
-    blinkyBlinky(index);
+    colorWipe(index, color(255, 0, 0));
     break;
   case 1:
-    sparklySparkly(index);
+    colorWipe(index, color(0, 255, 0));
     break;
-
-    //  case 0:
-    //    colorWipe(index, color(255, 0, 0));
-    //    break;
-    //  case 1:
-    //    colorWipe(index, color(0, 255, 0));
-    //    break;
   case 2:
     colorWipe(index, color(0, 0, 255));
     break;
@@ -125,6 +128,12 @@ void draw() {
   case 4:
   case 5:
     rainbowWarp(index);
+    break;
+  case 6:
+    blinkyBlinky(index);
+    break;
+  case 7:
+    sparklySparkly(index);
     break;
   }
 }

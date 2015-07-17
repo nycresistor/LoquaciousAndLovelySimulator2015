@@ -1,36 +1,54 @@
-PShape unicorn;
-VStrip head;
-VStrip frontleg;
-VStrip backleg;
-PImage bg;
-int offset_x = -55;
-int offset_y = -110;
+PShape leftShape;
+PShape rightShape;
+PImage leftBg;
+PImage rightBg;
+
+VStrip leftHead;
+VStrip leftFrontLeg;
+VStrip leftBackLeg;
+VStrip rightHead;
+VStrip rightFrontLeg;
+VStrip rightBackLeg;
+
+Arduino arduino;
 
 void setup() {
-  size(680,394);
-  unicorn = loadShape("unicorn.svg");
-  bg = loadImage("unicorn.jpeg");
-  shape(unicorn,offset_x,offset_y);
-  frontleg = new VStrip(unicorn.getChild("frontleg"));
-  backleg = new VStrip(unicorn.getChild("backleg"));
-  head = new VStrip(unicorn.getChild("head"));  
+  size(1360,394);
+  
+  // The vertexes in the SVG paths are used to 
+  // define where LEDs go
+  leftShape = loadShape("left.svg");
+  rightShape = loadShape("right.svg");
+  leftBg = loadImage("left.jpg");
+  rightBg = loadImage("right.jpg");
+  
+  // The virtual arduino sketch will instantiate a
+  // bunch of LPD8806s in its setup() method
+  arduino = new Arduino();
+  arduino.setup();
+  
+  // VStrip ties the LPD8806 instances to the SVG paths.
+  // The last two parameters are offsets to correct lining up with the background.
+  leftFrontLeg = new VStrip(leftShape.getChild("frontleg"), arduino.leftFrontLeg, -55, -110);
+  leftBackLeg = new VStrip(leftShape.getChild("backleg"), arduino.leftBackLeg, -55, -110);
+  leftHead = new VStrip(leftShape.getChild("head"), arduino.head, -55, -110);
+  rightFrontLeg = new VStrip(rightShape.getChild("frontleg"), arduino.rightFrontLeg, 670, -110);
+  rightBackLeg = new VStrip(rightShape.getChild("backleg"), arduino.rightBackLeg, 670, -110);
+  rightHead = new VStrip(rightShape.getChild("head"), arduino.head, 670, -110);
 }
 
 void draw() {
-  image(bg,0,0);
-
-  frontleg.setPixelColor(frameCount % frontleg.count(), color(255));
-  backleg.setPixelColor(frameCount % backleg.count(), color(255));
-  head.setPixelColor(frameCount % head.count(), color(255));
-
-  frontleg.show();
-  backleg.show();
-  head.show();
+  arduino.loop();
   
-  frontleg.setPixelColor(frameCount % frontleg.count(), color(0));
-  backleg.setPixelColor(frameCount % backleg.count(), color(0));
-  head.setPixelColor(frameCount % head.count(), color(0));
-  
+  image(leftBg,0,0);
+  image(rightBg,width/2,0);
+
+  leftFrontLeg.draw();
+  leftBackLeg.draw();
+  leftHead.draw();
+  rightFrontLeg.draw();
+  rightBackLeg.draw();
+  rightHead.draw();
 }
 
 

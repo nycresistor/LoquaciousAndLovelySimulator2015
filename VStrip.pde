@@ -1,34 +1,26 @@
 public class VStrip {
   PShape path;
-  color[] state;
+  LPD8806 strip;
+  int xOffset;
+  int yOffset;
   
-  public VStrip(PShape path) {
+  public VStrip(PShape path, LPD8806 strip, int xOffset, int yOffset) {
     this.path = path;
+    this.strip = strip;
     
     int size = this.path.getVertexCount();
-    this.state = new color[size];
+    this.xOffset = xOffset;
+    this.yOffset = yOffset;
   }
-  
-  public void setPixelColor(int idx, color c) {
-    state[idx] = c;
-  }
-  
-  public void setPixelColor(int idx, int r, int g, int b) {
-    state[idx] = color(r,g,b);
-  }
-  
-  public int count() {
-    return state.length;
-  }
-  
-  public void show() {
+    
+  public void draw() {
     PVector v;
     ellipseMode(CENTER);
-    for (int i=0; i<state.length; i++) {
+    for (int i=0; i<strip.led_array.length; i++) {
       v = path.getVertex(i);
-      fill(state[i]);
+      fill(strip.led_array[i]);
       noStroke();
-      ellipse(v.x+offset_x, v.y+offset_y,3,3);
+      ellipse(v.x+xOffset, v.y+yOffset,3,3);
     }
   }
 }

@@ -2,23 +2,37 @@
 // is to copy/paste it into the final sketch.
 
 class Arduino {
-  //#define color uint32_t
+
+//  #include <LPD8806.h>
 
   LPD8806 head;
   LPD8806 leftFrontLeg;
   LPD8806 leftBackLeg;
   LPD8806 rightFrontLeg;
   LPD8806 rightBackLeg;
+//  LPD8806 strips[5];
   LPD8806[] strips = new LPD8806[5];
 
-  //long frame;
-  //color col;
   int mode = 0;
-  int index = 0;
+  int idx = 0;
+//  int modes[8];
   int modes[] = new int[8];
-  color rainbowWipeColor = color(0, 0, 0);
+//  uint32_t rainbowWipeColor;
+  color rainbowWipeColor;
 
-  public void setup() {    
+
+//  uint32_t color(byte r, byte g, byte b) {
+//    return ((uint32_t)(g | 0x80) << 16) |
+//           ((uint32_t)(r | 0x80) <<  8) |
+//                       b | 0x80 ;
+//  }
+
+  void setup() {    
+//    strips[0] = head = LPD8806(100);
+//    strips[1] = leftFrontLeg = LPD8806(80);
+//    strips[2] = leftBackLeg = LPD8806(80);
+//    strips[3] = rightFrontLeg = LPD8806(80);
+//    strips[4] = rightBackLeg = LPD8806(80);
     strips[0] = head = new LPD8806(100);
     strips[1] = leftFrontLeg = new LPD8806(80);
     strips[2] = leftBackLeg = new LPD8806(80);
@@ -33,16 +47,14 @@ class Arduino {
     modes[5] = 100;  // rainbowWarp
     modes[6] = 100;  // blinkyBlinky
     modes[7] = 100;  // sparklySparkly
-
-    //frame = 0;
-    //col = head.Color(int(random(255)), int(random(255)), int(random(255)));
   }
 
-  void colorWipe(int index, color col) {
+//  void colorWipe(int idx, uint32_t col) {
+  void colorWipe(int idx, color col) {
     for (int strip = 0; strip < 5; strip++) {
       for (int led = 0; led < strips[strip].numPixels (); led++) {
 
-        if ( led <= ((strips[strip].numPixels() / float(modes[mode])) * index)) {
+        if ( led <= ((strips[strip].numPixels() / float(modes[mode])) * idx)) {
           strips[strip].setPixelColor(led, col);
         } else {
           // Leave it be
@@ -52,8 +64,8 @@ class Arduino {
     }
   }
 
-  void rainbowWarp(int index) {
-    if (index % 10 == 0) {
+  void rainbowWarp(int idx) {
+    if (idx % 10 == 0) {
       for (int i = 0; i < 5; i++) {
         for (int section = 0; section < 5; section++) {
             int led = (strips[i].numPixels() / 5) * section;
@@ -70,10 +82,10 @@ class Arduino {
     }
   }
 
-  void blinkyBlinky(int index) {
+  void blinkyBlinky(int idx) {
     for (int i = 0; i < 5 ; i++) {
       for (int led = 0; led < strips[i].numPixels (); led++) {
-        if (index % 6 < 3) {
+        if (idx % 6 < 3) {
           strips[i].setPixelColor(led, color(255, 255, 255));
         } else {
           strips[i].setPixelColor(led, color(0, 0, 0));
@@ -84,14 +96,14 @@ class Arduino {
     }
   }
 
-  void sparklySparkly(int index) {
-      if (index % 4 == 0) {
-        for (LPD8806 strip : strips) {
-          for (int led = 0; led < strip.numPixels (); led++) {
-            if (random(3) > 2) strip.setPixelColor(led, color(255, 255, 255));
-            else strip.setPixelColor(led, color(0, 0, 0));
+  void sparklySparkly(int idx) {
+      if (idx % 4 == 0) {
+        for (int i = 0; i < 5; i++) {
+          for (int led = 0; led < strips[i].numPixels(); led++) {
+            if (random(3) > 2) strips[i].setPixelColor(led, color(255, 255, 255));
+            else strips[i].setPixelColor(led, color(0, 0, 0));
           } 
-          strip.show();
+          strips[i].show();
         }
       }
     }
@@ -99,58 +111,40 @@ class Arduino {
   void clear() {
     for (int i=0; i<5; i++) {
       for (int led=0; led<strips[i].numPixels(); led++) {
-        strips[i].setPixelColor(led, color(0));
+        strips[i].setPixelColor(led, color(0,0,0));
       }
     }
   }
 
-/*
-  void loop() 
-  {
-     int i;
-     
-     frame++;
-     
-     if (frame % 100 == 0) {
-     col = color(random(255),random(255),random(255));
-     }
-     
-     for (i=0; i<5; i++) {
-       all[i].setPixelColor(int(frame % all[i].numPixels()), col);
-       all[i].show();
-     }
-   }
-*/
-
   void loop() {
-    index++;
-    if (index == modes[mode]) {
-      index = 0;
+    idx++;
+    if (idx == modes[mode]) {
+      idx = 0;
       mode++;
 
-      if (mode == modes.length) mode = 0;
+      if (mode == 8) mode = 0;
     }
 
     switch(mode) {
       case 0:
-        colorWipe(index, color(255, 0, 0));
+        colorWipe(idx, color(255, 0, 0));
         break;
       case 1:
-        colorWipe(index, color(0, 255, 0));
+        colorWipe(idx, color(0, 255, 0));
         break;
       case 2:
-        colorWipe(index, color(0, 0, 255));
+        colorWipe(idx, color(0, 0, 255));
         break;
       case 3:
       case 4:
       case 5:
-        rainbowWarp(index);
+        rainbowWarp(idx);
         break;
       case 6:
-        blinkyBlinky(index);
+        blinkyBlinky(idx);
         break;
       case 7:
-        sparklySparkly(index);
+        sparklySparkly(idx);
         break;
     }
   }

@@ -51,4 +51,3 @@ void draw() {
   rightHead.draw();
 }
 
-

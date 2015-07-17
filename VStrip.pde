@@ -7,8 +7,6 @@ public class VStrip {
   public VStrip(PShape path, LPD8806 strip, int xOffset, int yOffset) {
     this.path = path;
     this.strip = strip;
-    
-    int size = this.path.getVertexCount();
     this.xOffset = xOffset;
     this.yOffset = yOffset;
   }

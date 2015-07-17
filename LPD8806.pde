@@ -18,6 +18,10 @@ class LPD8806 {
     led_array[led] = col;
   }
 
+  color getPixelColor(int led) {
+    return led_array[led];
+  }
+  
   int numPixels() {
     return num_leds;
   }

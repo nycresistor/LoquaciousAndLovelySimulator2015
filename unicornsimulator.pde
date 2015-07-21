@@ -13,6 +13,7 @@ VStrip rightBackLeg;
 Arduino arduino;
 
 void setup() {
+  frameRate(1);
   size(1360,394);
   
   // The vertexes in the SVG paths are used to 

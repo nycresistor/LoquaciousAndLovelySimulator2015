@@ -17,14 +17,17 @@ class Arduino {
   // Offsets for the front-most LED
   //int offsets[] = {                                 // C
   int offsets[] = new int[] {                         // Java
-    0,30,10,70,50
+    55,30,10,70,50
   };
 
   int mode = 0;
   int idx = 0;
   int n_modes = 12;
-//  int modes[n_modes];                               // C
-  int modes[] = new int[n_modes];                     // Java
+//  int modes[] = {                                   // C
+  int modes[] = new int[] {                           // Java
+    600, 300, 300, 300, 300, 300, 
+    300, 300, 300, 300, 300, 300
+  };
 //  uint32_t currentColor;                            // C
   color currentColor;                                 // Java
 
@@ -66,10 +69,6 @@ class Arduino {
     strips[2] = leftBackLeg = new LPD8806(80);        // Java
     strips[3] = rightBackLeg = new LPD8806(80);       // Java
     strips[4] = rightFrontLeg = new LPD8806(80);      // Java
-
-    for (int i=0; i<n_modes; i++) {
-      modes[i] = 300;
-    }
   }
 
 // uint32_t stepColor(byte r, byte g, byte b, int step, float divisor) {   // C
@@ -88,7 +87,7 @@ class Arduino {
   }
   
   void gallop(int idx) {
-    int tailsize = 10;
+    int tailsize = 20;
     int x;
     int step;
     int len;
@@ -98,15 +97,17 @@ class Arduino {
     
     for (int i=0; i<n_strips; i++) {
       len = strips[i].numPixels();
-      hlen = ((tailsize+len)/2);
-      step = (i%2!=0 ? idx % hlen : (idx+150) % hlen) - tailsize; 
+      hlen = ((tailsize+len)/2) + tailsize/2;
+      step = (idx + i*8) % hlen - tailsize - tailsize/2;
       
-      for (int j=0; j<tailsize && step+j<len/2; j++) {
-        x = bound(offsets[i]+step+j, len); 
-        strips[i].setPixelColor(x,stepColor(255,255,255,j,8.0));
+      for (int j=0; j<tailsize && step+j<=len/2; j++) {
+        if (step+j>=0) {
+          x = bound(offsets[i]+step+j, len); 
+          strips[i].setPixelColor(x,stepColor(255,255,255,j,tailsize));
         
-        x = bound(offsets[i]-step-j, len);
-        strips[i].setPixelColor(x,stepColor(255,255,255,j,8.0));
+          x = bound(offsets[i]-step-j, len);
+          strips[i].setPixelColor(x,stepColor(255,255,255,j,tailsize));
+        }
       }
       
       strips[i].show();
@@ -153,7 +154,10 @@ class Arduino {
       for (int i = 0; i < 5; i++) {
         for (int section = 0; section < 5; section++) {
             int led = (strips[i].numPixels() / 5) * section;
-            strips[i].setPixelColor(led, color(random(50, 255), random(50, 255), random(50, 255)));
+            int col = int(random(n_colors));
+            int step = int(random(20));
+            //strips[i].setPixelColor(led, color(random(50, 255), random(50, 255), random(50, 255)));
+            strips[i].setPixelColor(led, stepColor(colors[col],colors[col+1],colors[col+2],step,10.0));
         }
       }
     }
@@ -214,23 +218,23 @@ class Arduino {
         gallop(idx);
         break;
       case 1:
-        exit();
       case 2:
       case 3:
-        colorBleed(idx, colors[mode*3], colors[mode*3+1], colors[mode*3+2], modes[mode] / 4.0);
-        break;
       case 4:
+        colorBleed(idx, colors[(mode-1)*3], colors[(mode-1)*3+1], colors[(mode-1)*3+2], modes[mode] / 4.0);
+        break;
       case 5:
       case 6:
       case 7:
-        colorWipe(idx, color(colors[(mode-4)*3], colors[(mode-4)*3+1], colors[(mode-4)*3+2]));
-        break;
       case 8:
+        colorWipe(idx, color(colors[(mode-5)*3], colors[(mode-5)*3+1], colors[(mode-5)*3+2]));
+        break;
       case 9:
       case 10:
+      case 11:
         rainbowWarp(idx);
         break;
-      case 11:
+      case 12:
         sparklySparkly(idx);
         break;
     }

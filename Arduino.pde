@@ -2,8 +2,8 @@
 // is to copy/paste it into the final sketch.
 
 class Arduino {
-
-//  #include <LPD8806.h>                              // C
+//#include <SPI.h>                                  // C
+//#include <LPD8806.h>                              // C
 
   int n_strips = 5;
   LPD8806 head;
@@ -15,9 +15,10 @@ class Arduino {
   LPD8806[] strips = new LPD8806[5];                  // Java
 
   // Offsets for the front-most LED
-  //int offsets[] = {                                 // C
+//  int offsets[] = {                                 // C
   int offsets[] = new int[] {                         // Java
-    55,30,10,70,50
+    55,30,10,70,50                                    // Java
+//    29,25,33,25,20                                  // C
   };
 
   int mode = 0;
@@ -34,10 +35,10 @@ class Arduino {
   int n_colors = 4;
 //  byte colors[] = {                                 // C
   int colors[] = new int[] {                          // Java 
-    214,37,152,  // Pink
-    64,224,208,  // Turquoise
-    0,35,102,    // Royal Blue
-    239,51,64    // Red
+    107,18,76,   // Pink
+    32,112,104,  // Turquoise
+    0,17,51,     // Royal Blue
+    119,25,32    // Red
   };
   
 //  uint32_t color(byte r, byte g, byte b) {          // C
@@ -59,23 +60,27 @@ class Arduino {
 //  }                                                 // C
 
   void setup() {    
-//    strips[0] = head = LPD8806(100);                // C
-//    strips[1] = leftFrontLeg = LPD8806(80);         // C
-//    strips[2] = leftBackLeg = LPD8806(80);          // C
-//    strips[3] = rightBackLeg = LPD8806(80);         // C
-//    strips[4] = rightFrontLeg = LPD8806(80);        // C
+//    strips[0] = head = LPD8806(100,2,7);                // C
+//    strips[1] = leftFrontLeg = LPD8806(80,1,6);         // C
+//    strips[2] = leftBackLeg = LPD8806(80,0,5);          // C
+//    strips[3] = rightBackLeg = LPD8806(80,3,8);         // C
+//    strips[4] = rightFrontLeg = LPD8806(80,4,16);        // C
     strips[0] = head = new LPD8806(100);              // Java
     strips[1] = leftFrontLeg = new LPD8806(80);       // Java
     strips[2] = leftBackLeg = new LPD8806(80);        // Java
     strips[3] = rightBackLeg = new LPD8806(80);       // Java
     strips[4] = rightFrontLeg = new LPD8806(80);      // Java
+
+    for (int i=0; i<n_strips; i++) {
+      strips[i].begin();
+    }
   }
 
 // uint32_t stepColor(byte r, byte g, byte b, int step, float divisor) {   // C
   color stepColor(int r, int g, int b, int step, float divisor) {          // Java
-    r = int(min(255,step/divisor*r));
-    g = int(min(255,step/divisor*g));
-    b = int(min(255,step/divisor*b));
+    r = int(min(127,step/divisor*r));
+    g = int(min(127,step/divisor*g));
+    b = int(min(127,step/divisor*b));
 
     return color(r,g,b);
   }
@@ -103,10 +108,10 @@ class Arduino {
       for (int j=0; j<tailsize && step+j<=len/2; j++) {
         if (step+j>=0) {
           x = bound(offsets[i]+step+j, len); 
-          strips[i].setPixelColor(x,stepColor(255,255,255,j,tailsize));
+          strips[i].setPixelColor(x,stepColor(127,127,127,j,tailsize));
         
           x = bound(offsets[i]-step-j, len);
-          strips[i].setPixelColor(x,stepColor(255,255,255,j,tailsize));
+          strips[i].setPixelColor(x,stepColor(127,127,127,j,tailsize));
         }
       }
       
@@ -188,7 +193,7 @@ class Arduino {
       if (idx % 4 == 0) {
         for (int i = 0; i < 5; i++) {
           for (int led = 0; led < strips[i].numPixels(); led++) {
-            if (random(3) > 2) strips[i].setPixelColor(led, color(255, 255, 255));
+            if (random(3) > 2) strips[i].setPixelColor(led, color(127, 127, 127));
             else strips[i].setPixelColor(led, color(0, 0, 0));
           } 
           strips[i].show();
@@ -207,6 +212,7 @@ class Arduino {
   void loop() {
     idx++;
     if (idx == modes[mode]) {
+     
       idx = 0;
       mode++;
 
@@ -238,5 +244,7 @@ class Arduino {
         sparklySparkly(idx);
         break;
     }
+
+//    delay(10); // C
   }
 }

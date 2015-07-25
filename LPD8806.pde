@@ -28,5 +28,8 @@ class LPD8806 {
 
   void show() {    
   }
+  
+  void begin() {
+  }
 }
 
